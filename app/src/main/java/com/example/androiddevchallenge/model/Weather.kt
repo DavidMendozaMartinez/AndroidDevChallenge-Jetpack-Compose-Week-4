@@ -15,15 +15,17 @@
  */
 package com.example.androiddevchallenge.model
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
+import com.example.androiddevchallenge.R
 
 @Immutable
-enum class Weather {
-    CLEAR,
-    WIND,
-    CLOUDS,
-    DRIZZLE,
-    RAIN,
-    THUNDERSTORM,
-    SNOW
+enum class Weather(@StringRes val stringResId: Int, @DrawableRes val iconResId: Int) {
+    CLEAR(R.string.description_clear, R.drawable.ic_clear),
+    WIND(R.string.description_wind, R.drawable.ic_wind),
+    CLOUDS(R.string.description_clouds, R.drawable.ic_clouds),
+    RAIN(R.string.description_rain, R.drawable.ic_rain),
+    STORM(R.string.description_storm, R.drawable.ic_storm),
+    SNOW(R.string.description_snow, R.drawable.ic_snow)
 }

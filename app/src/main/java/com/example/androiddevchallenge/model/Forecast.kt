@@ -44,7 +44,7 @@ val forecasts = listOf(
     Forecast(
         date = Calendar.getInstance(),
         temperature = Temperature(
-            min = 68.18F,
+            min = 68.1F,
             max = 77.9F
         ),
         weather = Weather.CLEAR
@@ -53,48 +53,48 @@ val forecasts = listOf(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) },
         temperature = Temperature(
             min = 65.3F,
-            max = 73.38F
+            max = 73.3F
         ),
         weather = Weather.WIND
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 2) },
         temperature = Temperature(
-            min = 55.47F,
-            max = 62.98F
+            min = 55.4F,
+            max = 62.9F
         ),
         weather = Weather.CLOUDS
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 3) },
         temperature = Temperature(
-            min = 58.33F,
-            max = 63.32F
-        ),
-        weather = Weather.DRIZZLE
-    ),
-    Forecast(
-        date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 4) },
-        temperature = Temperature(
-            min = 55.53F,
-            max = 59.38F
+            min = 58.3F,
+            max = 63.3F
         ),
         weather = Weather.RAIN
     ),
     Forecast(
+        date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 4) },
+        temperature = Temperature(
+            min = 55.5F,
+            max = 59.3F
+        ),
+        weather = Weather.STORM
+    ),
+    Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 5) },
         temperature = Temperature(
-            min = 50.11F,
-            max = 53.76F
+            min = 50.1F,
+            max = 53.7F
         ),
-        weather = Weather.THUNDERSTORM
+        weather = Weather.SNOW
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 6) },
         temperature = Temperature(
-            min = 31.89F,
-            max = 43.86F
+            min = 31.8F,
+            max = 43.8F
         ),
-        weather = Weather.SNOW
+        weather = Weather.RAIN
     )
 )
