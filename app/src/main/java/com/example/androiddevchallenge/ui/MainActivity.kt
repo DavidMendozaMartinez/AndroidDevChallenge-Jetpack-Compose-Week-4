@@ -20,25 +20,26 @@ import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
+import com.example.androiddevchallenge.ui.theme.Blue900
 import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.Purple100
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                setStatusBarTransparent(window, MaterialTheme.colors.isLight)
+                setupStatusBar(window, MaterialTheme.colors.isLight)
                 WeatherApp()
             }
         }
     }
 }
 
-fun setStatusBarTransparent(window: Window, lightTheme: Boolean) {
-    window.statusBarColor = Color.Transparent.toArgb()
+fun setupStatusBar(window: Window, lightTheme: Boolean) {
+    window.statusBarColor = if (lightTheme) Purple100.toArgb() else Blue900.toArgb()
     WindowCompat.setDecorFitsSystemWindows(window, false)
     WindowCompat.getInsetsController(window, window.decorView)
         ?.isAppearanceLightStatusBars = lightTheme

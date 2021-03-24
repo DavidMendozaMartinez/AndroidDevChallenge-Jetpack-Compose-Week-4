@@ -16,11 +16,8 @@
 package com.example.androiddevchallenge.ui.common
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -28,17 +25,13 @@ import androidx.compose.ui.res.painterResource
 @Composable
 fun Background(
     backgroundId: Int,
+    contentScale: ContentScale,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        contentAlignment = Alignment.BottomCenter,
+    Image(
+        painter = painterResource(id = backgroundId),
+        contentDescription = null,
+        contentScale = contentScale,
         modifier = modifier.fillMaxSize()
-    ) {
-        Image(
-            painter = painterResource(id = backgroundId),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    )
 }

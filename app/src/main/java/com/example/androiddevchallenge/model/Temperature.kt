@@ -20,5 +20,6 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class Temperature(
     val min: Float,
-    val max: Float
+    val max: Float,
+    val realFeel: Float
 )

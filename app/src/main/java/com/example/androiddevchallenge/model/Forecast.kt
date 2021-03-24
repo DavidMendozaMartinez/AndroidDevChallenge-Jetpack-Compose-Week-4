@@ -24,7 +24,12 @@ import java.util.Locale
 data class Forecast(
     val date: Calendar,
     val temperature: Temperature,
-    val weather: Weather
+    val weather: Weather,
+    val chanceOfRain: String,
+    val windSpeed: String,
+    val humidity: String,
+    val pressure: String,
+    val uvIndex: String
 ) {
     var dayOfWeek: String = with(Locale.getDefault()) {
         SimpleDateFormat("EEE", this).format(date.time).toUpperCase(this)
@@ -36,8 +41,24 @@ data class Forecast(
     }
 }
 
-object ForecastsRepository {
-    fun getForecasts() = forecasts
+object ForecastRepository {
+    fun getForecasts(@Suppress("UNUSED_PARAMETER") place: Place): List<Forecast> {
+        val shuffled = forecasts.shuffled()
+
+        return forecasts.mapIndexed { index, forecast ->
+            with(shuffled[index]) {
+                forecast.copy(
+                    temperature = temperature,
+                    weather = weather,
+                    chanceOfRain = chanceOfRain,
+                    windSpeed = windSpeed,
+                    humidity = humidity,
+                    pressure = pressure,
+                    uvIndex = uvIndex
+                )
+            }
+        }
+    }
 }
 
 val forecasts = listOf(
@@ -45,56 +66,98 @@ val forecasts = listOf(
         date = Calendar.getInstance(),
         temperature = Temperature(
             min = 68.1F,
-            max = 77.9F
+            max = 77.9F,
+            realFeel = 75.2F
         ),
-        weather = Weather.CLEAR
+        weather = Weather.CLEAR,
+        chanceOfRain = "0%",
+        windSpeed = "6.2 km/h",
+        humidity = "45%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) },
         temperature = Temperature(
             min = 65.3F,
-            max = 73.3F
+            max = 73.3F,
+            realFeel = 71.1F
         ),
-        weather = Weather.WIND
+        weather = Weather.WIND,
+        chanceOfRain = "20%",
+        windSpeed = "15.2 km/h",
+        humidity = "60%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 2) },
         temperature = Temperature(
             min = 55.4F,
-            max = 62.9F
+            max = 62.9F,
+            realFeel = 61.5F
         ),
-        weather = Weather.CLOUDS
+        weather = Weather.CLOUDS,
+        chanceOfRain = "40%",
+        windSpeed = "7.2 km/h",
+        humidity = "65%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 3) },
         temperature = Temperature(
             min = 58.3F,
-            max = 63.3F
+            max = 63.3F,
+            realFeel = 60.7F
         ),
-        weather = Weather.RAIN
+        weather = Weather.RAIN,
+        chanceOfRain = "85%",
+        windSpeed = "5.2 km/h",
+        humidity = "87%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 4) },
         temperature = Temperature(
             min = 55.5F,
-            max = 59.3F
+            max = 59.3F,
+            realFeel = 58.2F
         ),
-        weather = Weather.STORM
+        weather = Weather.STORM,
+        chanceOfRain = "72%",
+        windSpeed = "9.4 km/h",
+        humidity = "81%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 5) },
         temperature = Temperature(
-            min = 50.1F,
-            max = 53.7F
+            min = 31.8F,
+            max = 43.8F,
+            realFeel = 32.2F
         ),
-        weather = Weather.SNOW
+        weather = Weather.SNOW,
+        chanceOfRain = "0%",
+        windSpeed = "4.2 km/h",
+        humidity = "67%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     ),
     Forecast(
         date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 6) },
         temperature = Temperature(
-            min = 31.8F,
-            max = 43.8F
+            min = 50.1F,
+            max = 53.7F,
+            realFeel = 51.6F
         ),
-        weather = Weather.RAIN
+        weather = Weather.RAIN,
+        chanceOfRain = "92%",
+        windSpeed = "7.3 km/h",
+        humidity = "72%",
+        pressure = "1023 mbar",
+        uvIndex = "0"
     )
 )

@@ -46,20 +46,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.model.Forecast
-import com.example.androiddevchallenge.model.ForecastsRepository
+import com.example.androiddevchallenge.model.ForecastRepository
+import com.example.androiddevchallenge.model.Place
+import com.example.androiddevchallenge.model.PlaceRepository
 import com.example.androiddevchallenge.ui.common.Background
+import com.example.androiddevchallenge.ui.common.IconText
+import com.example.androiddevchallenge.ui.common.LabelText
+import com.example.androiddevchallenge.ui.place.PlaceChooser
 import com.google.accompanist.insets.statusBarsPadding
-import java.util.Locale
 
 @Composable
 fun Daily() {
@@ -72,8 +74,15 @@ fun Daily() {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            val places: List<Place> by remember { mutableStateOf(PlaceRepository.getPlaces()) }
+            var forecasts: List<Forecast> by remember { mutableStateOf(ForecastRepository.getForecasts(places.first())) }
+
+            PlaceChooser(
+                places = places,
+                onChosenPlace = { place -> forecasts = ForecastRepository.getForecasts(place) }
+            )
             ForecastList(
-                forecasts = ForecastsRepository.getForecasts()
+                forecasts = forecasts
             )
         }
     }
@@ -85,6 +94,7 @@ fun ForecastList(
     modifier: Modifier = Modifier
 ) {
     var expandedPosition by remember { mutableStateOf(0) }
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(16.dp),
@@ -112,19 +122,34 @@ fun ForecastItem(
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
-        Column {
-            VisibleForecastData(
-                forecast = forecast,
-                modifier = Modifier.padding(16.dp)
+        Box(
+            modifier = if (expanded) Modifier else Modifier.height(120.dp)
+        ) {
+            Background(
+                backgroundId = R.drawable.card_bg,
+                contentScale = if (expanded) ContentScale.Crop else ContentScale.FillBounds
             )
-            AnimatedVisibility(
-                visible = expanded,
-                enter = expandVertically(expandFrom = Alignment.Top),
-                exit = shrinkVertically(shrinkTowards = Alignment.Top)
-            ) {
-                Box(contentAlignment = Alignment.BottomCenter) {
-                    Background(backgroundId = R.drawable.card_bg)
-                    HourlyForecast()
+            Column {
+                VisibleForecastData(
+                    forecast = forecast,
+                    modifier = Modifier
+                        .height(120.dp)
+                        .padding(24.dp)
+                )
+                AnimatedVisibility(
+                    visible = expanded,
+                    enter = expandVertically(expandFrom = Alignment.Top),
+                    exit = shrinkVertically(shrinkTowards = Alignment.Top)
+                ) {
+                    Column {
+                        ExtendedForecastData(
+                            forecast = forecast,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        HourlyForecast(
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -193,39 +218,18 @@ fun MaxMinTemperatures(
     Column(
         modifier = modifier
     ) {
-        Temperature(
-            value = max,
+        LabelText(
+            text = "${max}º",
             style = MaterialTheme.typography.h5,
-            labelResId = R.string.label_max_temperature
+            label = stringResource(id = R.string.label_max_temperature)
         )
-        Temperature(
-            value = min,
+        LabelText(
+            text = "${min}º",
             style = MaterialTheme.typography.body1,
-            labelResId = R.string.label_min_temperature
+            label = stringResource(id = R.string.label_min_temperature),
+            space = 10.dp
         )
     }
-}
-
-@Composable
-fun Temperature(
-    value: Float,
-    style: TextStyle,
-    labelResId: Int,
-    modifier: Modifier = Modifier
-) {
-    val labelStyle = MaterialTheme.typography.overline.toSpanStyle().copy(
-        color = MaterialTheme.colors.primary
-    )
-    val text = buildAnnotatedString {
-        withStyle(labelStyle) { append(stringResource(labelResId).toUpperCase(Locale.getDefault())) }
-        append("${value}º")
-    }
-
-    Text(
-        text = text,
-        style = style,
-        modifier = modifier
-    )
 }
 
 @Composable
@@ -253,6 +257,67 @@ fun Weather(
 }
 
 @Composable
+fun ExtendedForecastData(
+    forecast: Forecast,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column {
+            IconText(
+                text = "${forecast.temperature.realFeel}º",
+                style = MaterialTheme.typography.body2,
+                iconPainter = painterResource(id = R.drawable.ic_temperature),
+                contentDescription = stringResource(id = R.string.content_description_real_feel)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            IconText(
+                text = forecast.chanceOfRain,
+                style = MaterialTheme.typography.body2,
+                iconPainter = painterResource(id = R.drawable.ic_rain),
+                contentDescription = stringResource(id = R.string.content_description_chance_of_rain)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            IconText(
+                text = forecast.windSpeed,
+                style = MaterialTheme.typography.body2,
+                iconPainter = painterResource(id = R.drawable.ic_wind),
+                contentDescription = stringResource(id = R.string.content_description_wind_speed)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1F))
+        Column {
+            LabelText(
+                text = forecast.humidity,
+                style = MaterialTheme.typography.body2,
+                label = stringResource(id = R.string.label_humidity),
+                space = 12.dp,
+                modifier = Modifier.height(24.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            LabelText(
+                text = forecast.pressure,
+                style = MaterialTheme.typography.body2,
+                label = stringResource(id = R.string.label_pressure),
+                modifier = Modifier.height(24.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            LabelText(
+                text = forecast.uvIndex,
+                style = MaterialTheme.typography.body2,
+                label = stringResource(id = R.string.label_uv_index),
+                space = 12.dp,
+                modifier = Modifier.height(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun HourlyForecast(
     modifier: Modifier = Modifier
 ) {
@@ -270,9 +335,7 @@ fun HourlyForecast(
         Image(
             painter = painterResource(id = R.drawable.ic_hourly_forecast),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 48.dp, vertical = 16.dp)
+            modifier = Modifier.padding(8.dp)
         )
     }
 }

@@ -11,14 +11,21 @@
       -->
     <string name="app_name">AndroidDevChallenge</string>
 
-    <string name="label_max_temperature">Max\u0020\u0020</string>
-    <string name="label_min_temperature">Min\u0020\u0020</string>
+    <string name="label_max_temperature">Max</string>
+    <string name="label_min_temperature">Min</string>
     <string name="description_clear">Clear</string>
     <string name="description_wind">Wind</string>
     <string name="description_clouds">Clouds</string>
     <string name="description_rain">Rain</string>
     <string name="description_storm">Storm</string>
     <string name="description_snow">Snow</string>
+
+    <string name="content_description_real_feel">Real feel</string>
+    <string name="content_description_chance_of_rain">Chance of rain</string>
+    <string name="content_description_wind_speed">Wind speed</string>
+    <string name="label_humidity">Humidity</string>
+    <string name="label_pressure">Pressure</string>
+    <string name="label_uv_index">UV index</string>
 
     <string name="label_hourly_forecast">Hourly forecast</string>
 </resources>
