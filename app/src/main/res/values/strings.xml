@@ -11,8 +11,8 @@
       -->
     <string name="app_name">AndroidDevChallenge</string>
 
-    <string name="label_max_temperature">Max:</string>
-    <string name="label_min_temperature">Min:</string>
+    <string name="label_max_temperature">Max\u0020\u0020</string>
+    <string name="label_min_temperature">Min\u0020\u0020</string>
     <string name="description_clear">Clear</string>
     <string name="description_wind">Wind</string>
     <string name="description_clouds">Clouds</string>
@@ -20,5 +20,5 @@
     <string name="description_storm">Storm</string>
     <string name="description_snow">Snow</string>
 
-    <string name="label_next_hours">Forecast for next hours</string>
+    <string name="label_hourly_forecast">Hourly forecast</string>
 </resources>

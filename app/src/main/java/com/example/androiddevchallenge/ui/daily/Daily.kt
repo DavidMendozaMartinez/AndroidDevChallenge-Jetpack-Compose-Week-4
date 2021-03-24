@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +35,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -48,14 +48,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.model.Forecast
 import com.example.androiddevchallenge.model.ForecastsRepository
 import com.example.androiddevchallenge.ui.common.Background
 import com.google.accompanist.insets.statusBarsPadding
+import java.util.Locale
 
 @Composable
 fun Daily() {
@@ -68,132 +72,207 @@ fun Daily() {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ForecastList(forecasts = ForecastsRepository.getForecasts())
+            ForecastList(
+                forecasts = ForecastsRepository.getForecasts()
+            )
         }
     }
 }
 
 @Composable
-fun ForecastList(forecasts: List<Forecast>) {
+fun ForecastList(
+    forecasts: List<Forecast>,
+    modifier: Modifier = Modifier
+) {
+    var expandedPosition by remember { mutableStateOf(0) }
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(16.dp),
+        modifier = modifier
     ) {
         items(forecasts) { forecast ->
-            ForecastItem(forecast = forecast, forecasts.first() == forecast)
+            ForecastItem(
+                forecast = forecast,
+                expanded = forecasts.indexOf(forecast) == expandedPosition,
+                onClick = { expandedPosition = forecasts.indexOf(forecast) }
+            )
         }
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ForecastItem(forecast: Forecast, initiallyExpanded: Boolean = false) {
-    var expanded by remember { mutableStateOf(initiallyExpanded) }
-
+fun ForecastItem(
+    forecast: Forecast,
+    expanded: Boolean,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = { expanded = !expanded })
+            .clickable(onClick = onClick)
     ) {
-        Box(contentAlignment = Alignment.BottomCenter) {
+        Column {
+            VisibleForecastData(
+                forecast = forecast,
+                modifier = Modifier.padding(16.dp)
+            )
             AnimatedVisibility(
                 visible = expanded,
-                enter = expandVertically(
-                    expandFrom = Alignment.Top
-                ),
-                exit = shrinkVertically(
-                    shrinkTowards = Alignment.Top,
-                )
+                enter = expandVertically(expandFrom = Alignment.Top),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top)
             ) {
-                Background(backgroundId = R.drawable.card_bg)
-            }
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxHeight()
-                    ) {
-                        Text(
-                            text = forecast.dayOfWeek,
-                            style = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Text(
-                            text = forecast.dayOfMonth,
-                            style = MaterialTheme.typography.h4
-                        )
-                        Text(
-                            text = forecast.month,
-                            style = MaterialTheme.typography.caption
-                        )
-                    }
-
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1F)
-                            .padding(start = 16.dp, end = 16.dp)
-                    ) {
-                        Text(
-                            text = "${forecast.temperature.max}º",
-                            style = MaterialTheme.typography.h5
-                        )
-                        Text(
-                            text = "${forecast.temperature.min}º",
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
-
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxHeight()
-                    ) {
-                        Image(
-                            painter = painterResource(id = forecast.weather.iconResId),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(50.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = stringResource(id = forecast.weather.stringResId),
-                            style = MaterialTheme.typography.caption,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-                AnimatedVisibility(visible = expanded) {
-                    Column {
-                        Text(
-                            text = stringResource(id = R.string.label_next_hours),
-                            color = MaterialTheme.colors.onBackground,
-                            style = MaterialTheme.typography.body1,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 80.dp,)
-                        )
-
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_hourly),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 48.dp, end = 48.dp, top = 16.dp, bottom = 16.dp)
-                        )
-                    }
+                Box(contentAlignment = Alignment.BottomCenter) {
+                    Background(backgroundId = R.drawable.card_bg)
+                    HourlyForecast()
                 }
             }
         }
+    }
+}
+
+@Composable
+fun VisibleForecastData(
+    forecast: Forecast,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Date(
+            dayOfWeek = forecast.dayOfWeek,
+            dayOfMonth = forecast.dayOfMonth,
+            month = forecast.month
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        MaxMinTemperatures(
+            max = forecast.temperature.max,
+            min = forecast.temperature.min,
+            modifier = Modifier.padding(end = 32.dp)
+        )
+        Weather(
+            iconResId = forecast.weather.iconResId,
+            labelResId = forecast.weather.stringResId
+        )
+    }
+}
+
+@Composable
+fun Date(
+    dayOfWeek: String,
+    dayOfMonth: String,
+    month: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Text(
+            text = dayOfWeek,
+            style = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Bold)
+        )
+        Text(
+            text = dayOfMonth,
+            style = MaterialTheme.typography.h4
+        )
+        Text(
+            text = month,
+            style = MaterialTheme.typography.caption
+        )
+    }
+}
+
+@Composable
+fun MaxMinTemperatures(
+    max: Float,
+    min: Float,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Temperature(
+            value = max,
+            style = MaterialTheme.typography.h5,
+            labelResId = R.string.label_max_temperature
+        )
+        Temperature(
+            value = min,
+            style = MaterialTheme.typography.body1,
+            labelResId = R.string.label_min_temperature
+        )
+    }
+}
+
+@Composable
+fun Temperature(
+    value: Float,
+    style: TextStyle,
+    labelResId: Int,
+    modifier: Modifier = Modifier
+) {
+    val labelStyle = MaterialTheme.typography.overline.toSpanStyle().copy(
+        color = MaterialTheme.colors.primary
+    )
+    val text = buildAnnotatedString {
+        withStyle(labelStyle) { append(stringResource(labelResId).toUpperCase(Locale.getDefault())) }
+        append("${value}º")
+    }
+
+    Text(
+        text = text,
+        style = style,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun Weather(
+    iconResId: Int,
+    labelResId: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = painterResource(id = iconResId),
+            contentDescription = null,
+            tint = MaterialTheme.colors.primary,
+            modifier = Modifier.size(50.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(id = labelResId),
+            style = MaterialTheme.typography.caption
+        )
+    }
+}
+
+@Composable
+fun HourlyForecast(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = stringResource(id = R.string.label_hourly_forecast),
+            color = MaterialTheme.colors.onBackground,
+            style = MaterialTheme.typography.body1,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_hourly_forecast),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 48.dp, vertical = 16.dp)
+        )
     }
 }
